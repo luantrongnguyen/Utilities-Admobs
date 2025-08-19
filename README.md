@@ -38,6 +38,7 @@ Thêm phụ thuộc `Utilities-Admobs` vào file `app/build.gradle.kts`:
 ```kotlin
 dependencies {
     implementation("com.github.luantrongnguyen:Utilities-Admobs:1.0.4")
+    implementation("com.google.android.gms:play-services-ads:23.3.0")
 }
 ```
 
