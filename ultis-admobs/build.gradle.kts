@@ -69,3 +69,12 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.7") // For Modifier, Alignment
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 }
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+}
