@@ -44,14 +44,6 @@ dependencies {
 ### Bước 3: Đồng bộ dự án
 Đồng bộ dự án với Gradle bằng cách nhấn **Sync Project with Gradle Files** trong Android Studio.
 
-## Yêu cầu
-
-- **Kotlin**: 1.9.24
-- **Jetpack Compose**: 1.6.8
-- **Google Mobile Ads SDK**: 23.3.0
-- **minSdk**: 21
-- **compileSdk**: 34
-- **Java**: 17
 
 ## Cấu hình AdMob
 
