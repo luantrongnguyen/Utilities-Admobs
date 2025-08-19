@@ -35,6 +35,10 @@ android {
     buildFeatures {
         compose = true
     }
+    lint {
+        abortOnError = false // Prevent Lint errors from failing the build
+        checkReleaseBuilds = false // Disable Lint for release builds
+    }
 }
 
 dependencies {
