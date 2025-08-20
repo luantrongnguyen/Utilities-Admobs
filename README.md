@@ -133,7 +133,7 @@ fun InterstitialAdScreen() {
     Button(onClick = { viewModel.loadInterstitialAd(context) }) {
         Text("Load Interstitial Ad")
     }
-    InterstitialAdHandler(adUnitId = "ca-app-pub-3940256099942544/1033173712", viewModel = viewModel, showOnLoad = true)
+    InterstitialAdHandler(viewModel = viewModel, showOnLoad = true)
 }
 ```
 
@@ -150,7 +150,6 @@ fun RewardedAdScreen() {
         Text("Load Rewarded Ad")
     }
     RewardedAdHandler(
-        adUnitId = "ca-app-pub-3940256099942544/5224354917",
         viewModel = viewModel,
         onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
         showOnLoad = true
@@ -172,7 +171,6 @@ fun RewardedInterstitialAdScreen() {
         Text("Load Rewarded Interstitial Ad")
     }
     RewardedInterstitialAdHandler(
-        adUnitId = "ca-app-pub-3940256099942544/5354046379",
         viewModel = viewModel,
         onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
         showOnLoad = true
@@ -192,7 +190,7 @@ fun AppOpenAdScreen() {
     Button(onClick = { viewModel.loadAppOpenAd(context) }) {
         Text("Load App Open Ad")
     }
-    AppOpenAdHandler(adUnitId = "ca-app-pub-3940256099942544/3416116414", viewModel = viewModel, showOnLoad = true)
+    AppOpenAdHandler(viewModel = viewModel, showOnLoad = true)
 }
 ```
 
@@ -201,86 +199,98 @@ fun AppOpenAdScreen() {
 Tạo một màn hình kiểm thử hiển thị tất cả các loại quảng cáo:
 
 ```kotlin
-@Composable
-fun AdTestScreen() {
-    val context = LocalContext.current
-    val interstitialViewModel = remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/1033173712")) }
-    val rewardedViewModel = remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/5224354917")) }
-    val rewardedInterstitialViewModel = remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/5354046379")) }
-    val appOpenViewModel = remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/3416116414")) }
-    var rewardMessage by remember { mutableStateOf("") }
+    @Composable
+    fun AdTestScreen() {
+        val context = LocalContext.current
+        val interstitialViewModel =
+            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/1033173712")) }
+        val rewardedViewModel =
+            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/5224354917")) }
+        val rewardedInterstitialViewModel =
+            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/5354046379")) }
+        val appOpenViewModel =
+            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/9257395921")) }
+        var rewardMessage by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Banner Ad", style = MaterialTheme.typography.titleMedium)
-        BannerAd(adUnitId = "ca-app-pub-3940256099942544/6300978111")
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Banner Ad", style = MaterialTheme.typography.titleMedium)
+            BannerAd(adUnitId = "ca-app-pub-3940256099942544/6300978111")
 
-        Text("Native Ad", style = MaterialTheme.typography.titleMedium)
-        NativeAd(adUnitId = "ca-app-pub-3940256099942544/2247696110") { nativeAd ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = nativeAd.headline ?: "No Headline",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = nativeAd.body ?: "No Body",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Interstitial Ad", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { interstitialViewModel.showInterstitialAd(context as Activity) }) {
+                Text("Show Interstitial Ad")
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+            InterstitialAdHandler(
+                viewModel = interstitialViewModel,
+                showOnLoad = false
+            )
 
-        Text("Interstitial Ad", style = MaterialTheme.typography.titleMedium)
-        Button(onClick = { interstitialViewModel.loadInterstitialAd(context) }) {
-            Text("Load Interstitial Ad")
-        }
-        InterstitialAdHandler(adUnitId = "ca-app-pub-3940256099942544/1033173712", viewModel = interstitialViewModel, showOnLoad = true)
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Rewarded Ad", style = MaterialTheme.typography.titleMedium)
-        Button(onClick = { rewardedViewModel.loadRewardedAd(context) }) {
-            Text("Load Rewarded Ad")
-        }
-        RewardedAdHandler(
-            adUnitId = "ca-app-pub-3940256099942544/5224354917",
-            viewModel = rewardedViewModel,
-            onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
-            showOnLoad = true
-        )
-        Text(rewardMessage)
-        Spacer(modifier = Modifier.height(16.dp))
+            Text("Rewarded Ad", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { rewardedViewModel.showRewardedAd(context as Activity, onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" }) }) {
+                Text("Show Rewarded Ad")
+            }
+            RewardedAdHandler(
+                viewModel = rewardedViewModel,
+                showOnLoad = false
+            )
+            Text(rewardMessage)
 
-        Text("Rewarded Interstitial Ad", style = MaterialTheme.typography.titleMedium)
-        Button(onClick = { rewardedInterstitialViewModel.loadRewardedInterstitialAd(context) }) {
-            Text("Load Rewarded Interstitial Ad")
-        }
-        RewardedInterstitialAdHandler(
-            adUnitId = "ca-app-pub-3940256099942544/5354046379",
-            viewModel = rewardedInterstitialViewModel,
-            onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
-            showOnLoad = true
-        )
-        Text(rewardMessage)
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text("App Open Ad", style = MaterialTheme.typography.titleMedium)
-        Button(onClick = { appOpenViewModel.loadAppOpenAd(context) }) {
-            Text("Load App Open Ad")
+            Text("Rewarded Interstitial Ad", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { rewardedInterstitialViewModel.showRewardedInterstitialAd(context as Activity, onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },) }) {
+                Text("Show Rewarded Interstitial Ad")
+            }
+            RewardedInterstitialAdHandler(
+                viewModel = rewardedInterstitialViewModel,
+//                onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
+                showOnLoad = false
+            )
+            Text(rewardMessage)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Native Ad", style = MaterialTheme.typography.titleMedium)
+            NativeAd(adUnitId = "ca-app-pub-3940256099942544/2247696110") { nav ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = nav.headline ?: "No Headline",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = nav.body ?: "No Body",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("App Open Ad", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { appOpenViewModel.showAppOpenAd(context as Activity, onFailedToShow = { mess -> Log.d("open",mess)}) }) {
+                Text("Load App Open Ad")
+            }
+            AppOpenAdHandler(
+                viewModel = appOpenViewModel,
+                showOnLoad = true
+            )
+
         }
-        AppOpenAdHandler(adUnitId = "ca-app-pub-3940256099942544/3416116414", viewModel = appOpenViewModel, showOnLoad = true)
     }
-}
 ```
 
 ## Đóng góp
