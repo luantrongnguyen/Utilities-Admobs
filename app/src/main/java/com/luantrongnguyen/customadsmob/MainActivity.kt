@@ -1,6 +1,8 @@
 package com.luantrongnguyen.customadsmob
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.luantrongnguyen.ultis_admobs.AdMobApplication
 import com.luantrongnguyen.ultis_admobs.compose.AppOpenAdHandler
 import com.luantrongnguyen.ultis_admobs.compose.BannerAd
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
         val rewardedInterstitialViewModel =
             remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/5354046379")) }
         val appOpenViewModel =
-            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/3416116414")) }
+            remember { AdMobViewModel(AdMobRepository("ca-app-pub-3940256099942544/9257395921")) }
         var rewardMessage by remember { mutableStateOf("") }
 
         Column(
@@ -70,43 +71,43 @@ class MainActivity : ComponentActivity() {
         ) {
             Text("Banner Ad", style = MaterialTheme.typography.titleMedium)
             BannerAd(adUnitId = "ca-app-pub-3940256099942544/6300978111")
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Interstitial Ad", style = MaterialTheme.typography.titleMedium)
-            Button(onClick = { interstitialViewModel.loadInterstitialAd(context) }) {
-                Text("Load Interstitial Ad")
+            Button(onClick = { interstitialViewModel.showInterstitialAd(context as Activity) }) {
+                Text("Show Interstitial Ad")
             }
             InterstitialAdHandler(
-                adUnitId = "ca-app-pub-3940256099942544/1033173712",
                 viewModel = interstitialViewModel,
-                showOnLoad = true
+                showOnLoad = false
             )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Rewarded Ad", style = MaterialTheme.typography.titleMedium)
-            Button(onClick = { rewardedViewModel.loadRewardedAd(context) }) {
-                Text("Load Rewarded Ad")
+            Button(onClick = { rewardedViewModel.showRewardedAd(context as Activity, onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" }) }) {
+                Text("Show Rewarded Ad")
             }
             RewardedAdHandler(
-                adUnitId = "ca-app-pub-3940256099942544/5224354917",
                 viewModel = rewardedViewModel,
-                onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
-                showOnLoad = true
+                showOnLoad = false
             )
             Text(rewardMessage)
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Rewarded Interstitial Ad", style = MaterialTheme.typography.titleMedium)
-            Button(onClick = { rewardedInterstitialViewModel.loadRewardedInterstitialAd(context) }) {
-                Text("Load Rewarded Interstitial Ad")
+            Button(onClick = { rewardedInterstitialViewModel.showRewardedInterstitialAd(context as Activity, onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },) }) {
+                Text("Show Rewarded Interstitial Ad")
             }
             RewardedInterstitialAdHandler(
-                adUnitId = "ca-app-pub-3940256099942544/5354046379",
                 viewModel = rewardedInterstitialViewModel,
-                onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
-                showOnLoad = true
+//                onReward = { type, amount -> rewardMessage = "Reward: $type, Amount: $amount" },
+                showOnLoad = false
             )
             Text(rewardMessage)
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Native Ad", style = MaterialTheme.typography.titleMedium)
@@ -126,18 +127,18 @@ class MainActivity : ComponentActivity() {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text("App Open Ad", style = MaterialTheme.typography.titleMedium)
-                Button(onClick = { appOpenViewModel.loadAppOpenAd(context) }) {
-                    Text("Load App Open Ad")
-                }
-                AppOpenAdHandler(
-                    adUnitId = "ca-app-pub-3940256099942544/3416116414",
-                    viewModel = appOpenViewModel,
-                    showOnLoad = true
-                )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("App Open Ad", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = { appOpenViewModel.showAppOpenAd(context as Activity, onFailedToShow = { mess -> Log.d("open",mess)}) }) {
+                Text("Load App Open Ad")
+            }
+            AppOpenAdHandler(
+                viewModel = appOpenViewModel,
+                showOnLoad = true
+            )
+
         }
     }
 }

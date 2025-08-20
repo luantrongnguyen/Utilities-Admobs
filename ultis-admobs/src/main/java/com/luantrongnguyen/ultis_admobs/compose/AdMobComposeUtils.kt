@@ -1,12 +1,10 @@
 package com.luantrongnguyen.ultis_admobs.compose
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -90,8 +88,7 @@ fun NativeAd(
 
 @Composable
 fun InterstitialAdHandler(
-    adUnitId: String,
-    viewModel: AdMobViewModel = remember { AdMobViewModel(AdMobRepository(adUnitId)) },
+    viewModel: AdMobViewModel ,
     showOnLoad: Boolean = false
 ) {
     val context = LocalContext.current
@@ -116,9 +113,8 @@ fun InterstitialAdHandler(
 
 @Composable
 fun RewardedAdHandler(
-    adUnitId: String,
-    viewModel: AdMobViewModel = remember { AdMobViewModel(AdMobRepository(adUnitId)) },
-    onReward: (type: String, amount: Int) -> Unit,
+    viewModel: AdMobViewModel,
+    onReward: (type: String, amount: Int) -> Unit = { _, _ -> },
     showOnLoad: Boolean = false
 ) {
     val context = LocalContext.current
@@ -143,9 +139,8 @@ fun RewardedAdHandler(
 
 @Composable
 fun RewardedInterstitialAdHandler(
-    adUnitId: String,
-    viewModel: AdMobViewModel = remember { AdMobViewModel(AdMobRepository(adUnitId)) },
-    onReward: (type: String, amount: Int) -> Unit,
+    viewModel: AdMobViewModel,
+    onReward: (type: String, amount: Int) -> Unit = { _, _ -> },
     showOnLoad: Boolean = false
 ) {
     val context = LocalContext.current
@@ -173,8 +168,7 @@ fun RewardedInterstitialAdHandler(
 
 @Composable
 fun AppOpenAdHandler(
-    adUnitId: String,
-    viewModel: AdMobViewModel = remember { AdMobViewModel(AdMobRepository(adUnitId)) },
+    viewModel: AdMobViewModel ,
     showOnLoad: Boolean = false,
     orientation: Int = com.google.android.gms.ads.appopen.AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT
 ) {

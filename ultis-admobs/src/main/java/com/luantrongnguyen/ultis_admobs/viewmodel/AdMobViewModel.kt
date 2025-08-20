@@ -3,7 +3,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.google.android.gms.ads.rewarded.ServerSideVerificationOptions
 import android.app.Activity
 import android.content.Context
 import com.google.android.gms.ads.AdError
@@ -50,7 +49,7 @@ class AdMobViewModel(private val repository: AdMobRepository) : ViewModel() {
         }
     }
 
-    fun showRewardedAd(activity: Activity, onReward: (type: String, amount: Int) -> Unit, onDismissed: () -> Unit = {}, onFailedToShow: (String) -> Unit = {}) {
+    fun showRewardedAd(activity: Activity, onReward: (String, Int) -> Unit, onDismissed: () -> Unit = {}, onFailedToShow: (String) -> Unit = {}) {
         val state = adState.value
         if (state is AdMobRepository.AdState.LoadedRewarded) {
             state.ad.fullScreenContentCallback = object : FullScreenContentCallback() {
