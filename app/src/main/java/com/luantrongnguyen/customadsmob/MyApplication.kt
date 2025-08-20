@@ -6,5 +6,9 @@ import com.luantrongnguyen.ultis_admobs.AppOpenAdUtil
 
 class MyApplication : AdMobApplication() {
     override val appOpenAdUnitId: String
-        get() = "ca-app-pub-3940256099942544/3416116414" // Test ID for App Open Ad
+        get() = "ca-app-pub-3940256099942544/9257395921" // Test ID for App Open Ad
+    override val excludedActivities: Set<String>
+        get() = setOf(
+            "com.luantrongnguyen.customadsmob.MainActivity", // Example: Exclude MainActivity
+        )
 }

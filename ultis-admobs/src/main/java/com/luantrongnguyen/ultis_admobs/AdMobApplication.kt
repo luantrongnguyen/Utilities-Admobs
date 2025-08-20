@@ -6,26 +6,25 @@ import com.google.android.gms.ads.MobileAds
 abstract class AdMobApplication : Application() {
     private lateinit var appOpenAdUtil: AppOpenAdUtil
 
-    // Abstract property để yêu cầu ứng dụng cung cấp adUnitId
     abstract val appOpenAdUnitId: String
+
+    // Define excluded activities (override in subclass if needed)
+    open val excludedActivities: Set<String> = emptySet()
 
     override fun onCreate() {
         super.onCreate()
-        // Khởi tạo AdMob SDK
-        MobileAds.initialize(this) {}
-        // Khởi tạo AppOpenAdUtil
+        MobileAds.initialize(this) { println("AdMob initialized") }
         appOpenAdUtil = AppOpenAdUtil(
             application = this,
-            adUnitId = appOpenAdUnitId
+            adUnitId = appOpenAdUnitId,
+            excludedActivities = excludedActivities
         )
     }
 
-    // Cung cấp Activity hiện tại cho AppOpenAdUtil
     fun setCurrentActivity(activity: android.app.Activity) {
         appOpenAdUtil.setCurrentActivity(activity)
     }
 
-    // Hủy AppOpenAdUtil khi cần
     fun cleanup() {
         appOpenAdUtil.cleanup()
     }

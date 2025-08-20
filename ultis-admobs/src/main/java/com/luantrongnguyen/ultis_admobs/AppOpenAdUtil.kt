@@ -14,49 +14,71 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 class AppOpenAdUtil(
     private val application: Application,
     private val adUnitId: String,
-    private val viewModel: AdMobViewModel = AdMobViewModel(AdMobRepository(adUnitId))
+    private val viewModel: AdMobViewModel = AdMobViewModel(AdMobRepository(adUnitId)),
+    private val excludedActivities: Set<String> = emptySet() // List of activity class names to exclude
 ) : LifecycleObserver {
 
-    private var isShowingAd = false
+    private var isShowingAd = AtomicBoolean(false)
     private var currentActivity: android.app.Activity? = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var wasBackgrounded = false
 
-    // Trạng thái quảng cáo từ ViewModel
     val adState: StateFlow<AdMobRepository.AdState> = viewModel.adState
 
     init {
-        // Đăng ký observer để theo dõi lifecycle của ứng dụng
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        // Theo dõi trạng thái quảng cáo
+        // Preload ad on initialization
+        loadAndShowAd()
         scope.launch {
             adState.collectLatest { state ->
-                if (state is AdMobRepository.AdState.LoadedAppOpen && !isShowingAd && currentActivity != null) {
-                    isShowingAd = true
-                    viewModel.showAppOpenAd(
-                        activity = currentActivity!!,
-                        onDismissed = { isShowingAd = false },
-                        onFailedToShow = { isShowingAd = false }
-                    )
+                if (state is AdMobRepository.AdState.LoadedAppOpen && !isShowingAd.get() && currentActivity != null && wasBackgrounded) {
+                    // Check if current activity is in excluded list
+                    val currentActivityName = currentActivity!!::class.java.name
+                    if (currentActivityName !in excludedActivities) {
+                        viewModel.showAppOpenAd(
+                            activity = currentActivity!!,
+                            onDismissed = {
+                                isShowingAd.set(false)
+                                wasBackgrounded = false
+                                loadAndShowAd() // Preload next ad
+                            },
+                            onFailedToShow = {
+                                isShowingAd.set(false)
+                                wasBackgrounded = false
+                                loadAndShowAd() // Retry loading
+                            }
+                        )
+                        isShowingAd.set(true)
+                    } else {
+                        isShowingAd.set(false) // Reset flag if ad is skipped
+                        println("AppOpenAdUtil: Ad skipped for excluded activity $currentActivityName")
+                    }
                 }
             }
         }
     }
 
-    // Gọi khi ứng dụng vào foreground
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForeground() {
-        if (!isShowingAd) {
+        println("AppOpenAdUtil: App moved to foreground, wasBackgrounded=$wasBackgrounded, currentActivity=${currentActivity?.javaClass?.name}")
+        if (!isShowingAd.get()) {
             loadAndShowAd()
         }
     }
 
-    // Thiết lập activity hiện tại (gọi từ Activity)
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppBackground() {
+        println("AppOpenAdUtil: App moved to background")
+        wasBackgrounded = true
+    }
+
     fun setCurrentActivity(activity: android.app.Activity) {
         currentActivity = activity
     }
@@ -65,7 +87,6 @@ class AppOpenAdUtil(
         viewModel.loadAppOpenAd(application, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT)
     }
 
-    // Hủy observer và coroutine scope khi không cần thiết
     fun cleanup() {
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
         scope.cancel()
