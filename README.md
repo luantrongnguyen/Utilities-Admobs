@@ -209,35 +209,6 @@ fun RewardedInterstitialAdScreen() {
 }
 ```
 
-## Giải quyết sự cố
-
-### 1. Lỗi `Cannot access class 'NativeAd'`
-- Đảm bảo `com.google.android.gms:play-services-ads:23.3.0` có trong `app/build.gradle.kts` và `ultis-admobs/build.gradle.kts`.
-- Kiểm tra import `com.google.android.gms.ads.nativead.NativeAd`.
-- Chạy `./gradlew app:dependencies` để kiểm tra xung đột.
-
-### 2. Lỗi `Backend Internal error: Exception during IR lowering`
-- Đảm bảo Kotlin (`1.9.24`) và Compose compiler (`1.5.14`) tương thích.
-- Thử hạ cấp xuống Kotlin `1.9.22` và `kotlinCompilerExtensionVersion = "1.5.11"`.
-- Thêm cấu hình giải quyết xung đột:
-  ```kotlin
-  configurations.all {
-      resolutionStrategy {
-          force("com.google.android.gms:play-services-ads:23.3.0")
-          force("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
-      }
-  }
-  ```
-- Xóa cache IDE: **File > Invalidate Caches / Restart**.
-
-### 3. Quảng cáo App Open hiển thị ở Activity không mong muốn
-- Kiểm tra `excludedActivities` trong `MyApplication`.
-- Kiểm tra Logcat (tag: `AppOpenAdUtil`) để xác nhận Activity bị loại trừ.
-
-### 4. Quảng cáo không tải
-- Sử dụng ID kiểm thử của AdMob.
-- Kiểm tra Logcat (tag: `AdMob`) để xem lỗi tải quảng cáo.
-
 ## Đóng góp
 
 - Fork repository và tạo pull request với cải tiến hoặc sửa lỗi.
